@@ -34,3 +34,23 @@ parentPort.once("message", async (message) => {
     console.log(message);
     await Promise.all(dbPromArr);  
 });
+
+
+router.get('/:id', (req, res) => {
+    db.article.findOne({
+      where: { id: req.params.id },
+      include: [db.author, {
+        model: db.comment,
+        include: [db.user]
+      }]
+    })
+    .then((article) => {
+      if (!article) throw Error()
+      console.log(article.author)
+      res.render('articles/show', { article: article })
+    })
+    .catch((error) => {
+      console.log(error)
+      res.status(400).render('main/404')
+    })
+  })
